@@ -58,7 +58,7 @@ plugins:
 service_packages:
 - description: IDP migration api
   document:
-    path: DarwinB2CMigration.Api/README.md
+    path: README.md
     published: true
   name: DarwinB2CMigration.Api
   versions:

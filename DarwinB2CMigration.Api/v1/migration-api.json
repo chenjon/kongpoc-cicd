@@ -1,0 +1,130 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+      "title": "DarwinB2CMigration.Api",
+      "version": "v1"
+    },
+    "servers": [
+      {
+        "url": "https://darwinb2cmigrationapi.azurewebsites.net/"
+      }
+    ],
+    "paths": {
+      "/api/Identity/validate": {
+        "post": {
+          "tags": [
+            "Identity"
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InputClaimsModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InputClaimsModel"
+                }
+              },
+              "application/*+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InputClaimsModel"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/api/Identity/pcnvalidate": {
+        "post": {
+          "tags": [
+            "Identity"
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PcnModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PcnModel"
+                }
+              },
+              "application/*+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PcnModel"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/api/Identity/userprofile": {
+        "get": {
+          "tags": [
+            "Identity"
+          ],
+          "parameters": [
+            {
+              "name": "email",
+              "in": "query",
+              "schema": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "InputClaimsModel": {
+          "type": "object",
+          "properties": {
+            "userName": {
+              "type": "string",
+              "nullable": true
+            },
+            "password": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          "additionalProperties": false
+        },
+        "PcnModel": {
+          "type": "object",
+          "properties": {
+            "pcn": {
+              "type": "string",
+              "nullable": true
+            },
+            "cardHolderId": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  }
