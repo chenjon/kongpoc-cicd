@@ -297,7 +297,7 @@ service_packages:
               hide_client_headers: false
               hour: null
               limit_by: consumer
-              minute: 1
+              minute: 10
               month: null
               path: null
               policy: local
