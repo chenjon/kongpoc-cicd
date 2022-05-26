@@ -1,0 +1,24 @@
+name: CI
+ 
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+ 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+ 
+    steps:
+    - name: "checkout"
+      uses: actions/checkout@v2
+    - name: Install deck
+      uses: kong/setup-deck@v1
+      with:
+        deck-version: 1.12.1
+    - name: decK ping
+      run: deck konnect ping --konnect-email ${{ secrets.KONNECT_EMAIL }} --konnect-password ${{ secrets.KONNECT_PASSWORD }}
+    - name: decK validate
+      run: deck validate
+    - name: decK diff
+      run: deck konnect diff --konnect-email ${{ secrets.KONNECT_EMAIL }} --konnect-password ${{ secrets.KONNECT_PASSWORD }}

@@ -1,0 +1,44 @@
+_format_version: "1.1"
+services:
+  - name: DarwinB2CMigration.Api
+    protocol: https
+    host: darwinb2cmigrationapi.azurewebsites.net
+    port: 443
+    path: /
+    plugins: []
+    routes:
+      - tags:
+          - OAS3_import
+          - OAS3file_migration-api.json
+          - DarwinB2CMigration
+        name: DarwinB2CMigration.Api-api-Identity-validate-post
+        methods:
+          - POST
+        paths:
+          - /api/Identity/validate$
+        strip_path: false
+      - tags:
+          - OAS3_import
+          - OAS3file_migration-api.json
+          - DarwinB2CMigration
+        name: DarwinB2CMigration.Api-api-Identity-pcnvalidate-post
+        methods:
+          - POST
+        paths:
+          - /api/Identity/pcnvalidate$
+        strip_path: false
+      - tags:
+          - OAS3_import
+          - OAS3file_migration-api.json
+          - DarwinB2CMigration
+        name: DarwinB2CMigration.Api-api-Identity-userprofile-get
+        methods:
+          - GET
+        paths:
+          - /api/Identity/userprofile$
+        strip_path: false
+    tags:
+      - OAS3_import
+      - OAS3file_migration-api.json
+      - DarwinB2CMigration
+

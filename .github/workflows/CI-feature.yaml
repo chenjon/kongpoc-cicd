@@ -1,0 +1,53 @@
+name: CI-feature branch(used by developerto push konnect.yaml to develop branch)
+ 
+on:
+  push:
+    branches: [ feature/demo ]
+  workflow_dispatch:
+ 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+ 
+    steps:
+    #- name: "checkout"
+    #  uses: actions/checkout@v2
+    - name: "checkout to develop"
+      uses: actions/checkout@v3
+      with:
+        ref: develop
+    - name: "remove konnect.yaml before craeting new"
+      run: |
+          git rm konnect.yaml konnect_baseline.yaml
+
+    - name: Install Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - name: Install inso
+      run: npm install --global insomnia-inso
+    - name: Generate Kong declarative configuration from OpenApi Spec
+      run: inso generate config ./openapi/migration-api.json --type declarative > kong.yaml
+
+    - name: Install deck
+      uses: kong/setup-deck@v1
+      with:
+        deck-version: 1.8.0
+    - name: Convert kong.yaml to konnect.yaml for syncing with Konnect
+      run: deck convert --from kong-gateway --to konnect --input-file kong.yaml --output-file konnect.yaml
+    - name: decK ping
+      run: deck konnect ping --konnect-email ${{ secrets.KONNECT_EMAIL }} --konnect-password ${{ secrets.KONNECT_PASSWORD }}
+    - name: decK dump
+      run: deck konnect dump --konnect-email ${{ secrets.KONNECT_EMAIL }} --konnect-password ${{ secrets.KONNECT_PASSWORD }} --output-file konnect_baseline.yaml
+    - name: decK validate
+      run: deck validate
+    - name: decK diff
+      run: deck konnect diff --konnect-email ${{ secrets.KONNECT_EMAIL }} --konnect-password ${{ secrets.KONNECT_PASSWORD }}
+    
+    - name: "push"
+      run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add konnect.yaml konnect_baseline.yaml
+          git commit -m "added konnect yaml files"
+          git push

@@ -1,0 +1,603 @@
+_format_version: "0.1"
+plugins:
+- config:
+    credentials: true
+    exposed_headers: null
+    headers: null
+    max_age: 3600
+    methods:
+    - GET
+    - HEAD
+    - PUT
+    - PATCH
+    - POST
+    - DELETE
+    - OPTIONS
+    - TRACE
+    - CONNECT
+    origins:
+    - '*'
+    preflight_continue: false
+  enabled: true
+  name: cors
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  tags:
+  - dev
+- config:
+    cache_control: true
+    cache_ttl: 300
+    content_type:
+    - text/plain
+    - application/json
+    memory:
+      dictionary_name: kong_db_cache
+    request_method:
+    - GET
+    - HEAD
+    response_code:
+    - 200
+    - 301
+    - 404
+    storage_ttl: null
+    strategy: memory
+    vary_headers: null
+    vary_query_params: null
+  enabled: true
+  name: proxy-cache
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  tags:
+  - dev
+service_packages:
+- description: IDP migration api
+  document:
+    path: DarwinB2CMigration.Api/README.md
+    published: true
+  name: DarwinB2CMigration.Api
+  versions:
+  - document:
+      path: DarwinB2CMigration.Api/v1/migration-api-v2.json
+      published: true
+    implementation:
+      kong:
+        service:
+          connect_timeout: 60000
+          enabled: true
+          host: darwinb2cmigrationapi.azurewebsites.net
+          id: f1265761-6c77-4d26-bfca-61972b6bd027
+          path: /
+          plugins:
+          - config:
+              per_consumer: false
+            enabled: true
+            name: prometheus
+            protocols:
+            - grpc
+            - grpcs
+            - http
+            - https
+            tags:
+            - demo
+          port: 443
+          protocol: https
+          read_timeout: 60000
+          retries: 5
+          routes:
+          - https_redirect_status_code: 426
+            methods:
+            - POST
+            name: DarwinB2CMigration.Api-api-Identity-pcnvalidate-post
+            path_handling: v0
+            paths:
+            - /api/Identity/pcnvalidate$
+            preserve_host: false
+            protocols:
+            - http
+            - https
+            regex_priority: 0
+            request_buffering: true
+            response_buffering: true
+            strip_path: false
+            tags:
+            - OAS3_import
+            - OAS3file_migration-api.json
+          - https_redirect_status_code: 426
+            methods:
+            - GET
+            name: DarwinB2CMigration.Api-api-Identity-userprofile-get
+            path_handling: v0
+            paths:
+            - /api/Identity/userprofile$
+            preserve_host: false
+            protocols:
+            - http
+            - https
+            regex_priority: 0
+            request_buffering: true
+            response_buffering: true
+            strip_path: false
+            tags:
+            - OAS3_import
+            - OAS3file_migration-api.json
+          - https_redirect_status_code: 426
+            methods:
+            - POST
+            name: DarwinB2CMigration.Api-api-Identity-validate-post
+            path_handling: v0
+            paths:
+            - /api/Identity/validate$
+            preserve_host: false
+            protocols:
+            - http
+            - https
+            regex_priority: 0
+            request_buffering: true
+            response_buffering: true
+            strip_path: false
+            tags:
+            - OAS3_import
+            - OAS3file_migration-api.json
+          - https_redirect_status_code: 426
+            methods:
+            - GET
+            name: DarwinB2CMigration.Api-api-User-user-get
+            path_handling: v0
+            paths:
+            - /api/User/user$
+            preserve_host: false
+            protocols:
+            - http
+            - https
+            regex_priority: 0
+            request_buffering: true
+            response_buffering: true
+            strip_path: false
+            tags:
+            - OAS3_import
+            - OAS3file_migration-api.json
+          tags:
+          - OAS3_import
+          - OAS3file_migration-api.json
+          write_timeout: 60000
+      type: kong-gateway
+    version: v1
+- description: demo
+  name: demo
+  versions:
+  - implementation:
+      kong:
+        service:
+          connect_timeout: 60000
+          enabled: true
+          host: httpbin.org
+          id: cf9fd64c-0076-4d22-a9c3-74d445687da4
+          path: /anything
+          plugins:
+          - config:
+              consumer_tag: consumer
+              host: localhost
+              metrics:
+              - consumer_identifier: custom_id
+                name: request_count
+                sample_rate: 1
+                stat_type: counter
+                tags:
+                - app:kong
+              - consumer_identifier: custom_id
+                name: latency
+                sample_rate: null
+                stat_type: timer
+                tags:
+                - app:kong
+              - consumer_identifier: custom_id
+                name: request_size
+                sample_rate: null
+                stat_type: timer
+                tags:
+                - app:kong
+              - consumer_identifier: custom_id
+                name: response_size
+                sample_rate: null
+                stat_type: timer
+                tags:
+                - app:kong
+              - consumer_identifier: custom_id
+                name: upstream_latency
+                sample_rate: null
+                stat_type: timer
+                tags:
+                - app:kong
+              - consumer_identifier: custom_id
+                name: kong_latency
+                sample_rate: null
+                stat_type: timer
+                tags:
+                - app:kong
+              port: 8125
+              prefix: kong.demo
+              service_name_tag: demo-v1
+              status_tag: status
+            enabled: true
+            name: datadog
+            protocols:
+            - grpc
+            - grpcs
+            - http
+            - https
+            tags:
+            - demo-v1
+          - config:
+              anonymous: null
+              hide_credentials: false
+              key_in_body: false
+              key_in_header: true
+              key_in_query: true
+              key_names:
+              - apikey
+              run_on_preflight: true
+            enabled: true
+            name: key-auth
+            protocols:
+            - grpc
+            - grpcs
+            - http
+            - https
+            tags:
+            - demo
+          - config:
+              per_consumer: false
+            enabled: true
+            name: prometheus
+            protocols:
+            - grpc
+            - grpcs
+            - http
+            - https
+            tags:
+            - demo
+          - config:
+              cache_control: false
+              cache_ttl: 300
+              content_type:
+              - text/plain
+              - application/json
+              memory:
+                dictionary_name: kong_db_cache
+              request_method:
+              - GET
+              - HEAD
+              response_code:
+              - 200
+              - 301
+              - 404
+              storage_ttl: null
+              strategy: memory
+              vary_headers: null
+              vary_query_params: null
+            enabled: false
+            name: proxy-cache
+            protocols:
+            - grpc
+            - grpcs
+            - http
+            - https
+            tags:
+            - demo
+          - config:
+              day: null
+              fault_tolerant: true
+              header_name: null
+              hide_client_headers: false
+              hour: null
+              limit_by: consumer
+              minute: 1
+              month: null
+              path: null
+              policy: local
+              redis_database: 0
+              redis_host: null
+              redis_password: null
+              redis_port: 6379
+              redis_server_name: null
+              redis_ssl: false
+              redis_ssl_verify: false
+              redis_timeout: 2000
+              redis_username: null
+              second: null
+              year: null
+            enabled: true
+            name: rate-limiting
+            protocols:
+            - grpc
+            - grpcs
+            - http
+            - https
+            tags:
+            - demo
+          port: 80
+          protocol: http
+          read_timeout: 60000
+          retries: 5
+          routes:
+          - https_redirect_status_code: 426
+            name: demo-v1
+            path_handling: v0
+            paths:
+            - /v1/items
+            preserve_host: false
+            protocols:
+            - http
+            regex_priority: 0
+            request_buffering: true
+            response_buffering: true
+            strip_path: true
+          write_timeout: 60000
+      type: kong-gateway
+    version: v1
+  - implementation:
+      kong:
+        service:
+          connect_timeout: 60000
+          enabled: true
+          host: httpbin.org
+          id: 3b7c4d89-3806-4426-85a9-a12057c7f14f
+          path: /anything
+          port: 80
+          protocol: http
+          read_timeout: 60000
+          retries: 5
+          routes:
+          - https_redirect_status_code: 426
+            name: demo-v2
+            path_handling: v0
+            paths:
+            - /v2/items
+            preserve_host: false
+            protocols:
+            - http
+            regex_priority: 0
+            request_buffering: true
+            response_buffering: true
+            strip_path: true
+          write_timeout: 60000
+      type: kong-gateway
+    version: v2
+  - implementation:
+      kong:
+        service:
+          connect_timeout: 60000
+          enabled: true
+          host: httpbin.org
+          id: 0da8854d-72a5-4f90-bc76-97eacc85ab03
+          path: /anything
+          port: 80
+          protocol: http
+          read_timeout: 60000
+          retries: 5
+          routes:
+          - https_redirect_status_code: 426
+            name: demo-v3
+            path_handling: v0
+            paths:
+            - /v3/items
+            preserve_host: false
+            protocols:
+            - http
+            regex_priority: 0
+            request_buffering: true
+            response_buffering: true
+            strip_path: true
+          write_timeout: 60000
+      type: kong-gateway
+    version: v3
+- description: example service
+  name: example-service
+  versions:
+  - implementation:
+      kong:
+        service:
+          connect_timeout: 60000
+          enabled: true
+          host: example_upstream
+          id: b292df07-a792-42bf-8845-1ae09c342ab8
+          plugins:
+          - config:
+              consumer_tag: consumer
+              host: localhost
+              metrics:
+              - consumer_identifier: consumer_id
+                name: request_count
+                sample_rate: 1
+                stat_type: counter
+                tags:
+                - app:kong
+              - consumer_identifier: custom_id
+                name: latency
+                sample_rate: null
+                stat_type: timer
+                tags:
+                - app:kong
+              - consumer_identifier: custom_id
+                name: request_size
+                sample_rate: null
+                stat_type: timer
+                tags:
+                - app:kong
+              - consumer_identifier: custom_id
+                name: response_size
+                sample_rate: null
+                stat_type: timer
+                tags:
+                - app:kong
+              - consumer_identifier: custom_id
+                name: upstream_latency
+                sample_rate: null
+                stat_type: timer
+                tags:
+                - app:kong
+              - consumer_identifier: consumer_id
+                name: kong_latency
+                sample_rate: null
+                stat_type: timer
+                tags:
+                - app:kong
+              port: 8125
+              prefix: kong.configuration
+              service_name_tag: configuration
+              status_tag: status
+            enabled: true
+            name: datadog
+            protocols:
+            - grpc
+            - grpcs
+            - http
+            - https
+            tags:
+            - dev
+            - configuration
+          - config:
+              cache_control: true
+              cache_ttl: 300
+              content_type:
+              - text/plain
+              - application/json
+              memory:
+                dictionary_name: kong_db_cache
+              request_method:
+              - GET
+              - HEAD
+              response_code:
+              - 200
+              - 301
+              - 404
+              storage_ttl: null
+              strategy: memory
+              vary_headers: null
+              vary_query_params: null
+            enabled: false
+            name: proxy-cache
+            protocols:
+            - grpc
+            - grpcs
+            - http
+            - https
+            tags:
+            - Demo
+          port: 80
+          protocol: http
+          read_timeout: 60000
+          retries: 5
+          routes:
+          - https_redirect_status_code: 426
+            id: 7e76bb75-4196-4152-a6b5-d39a46936d63
+            path_handling: v0
+            paths:
+            - /mock
+            preserve_host: false
+            protocols:
+            - http
+            regex_priority: 0
+            request_buffering: true
+            response_buffering: true
+            strip_path: true
+          - https_redirect_status_code: 426
+            name: accounts
+            path_handling: v0
+            paths:
+            - /accounts
+            preserve_host: false
+            protocols:
+            - http
+            regex_priority: 0
+            request_buffering: true
+            response_buffering: true
+            strip_path: true
+          write_timeout: 60000
+      type: kong-gateway
+    version: v1
+upstreams:
+- algorithm: round-robin
+  hash_fallback: none
+  hash_on: none
+  hash_on_cookie_path: /
+  healthchecks:
+    active:
+      concurrency: 10
+      healthy:
+        http_statuses:
+        - 200
+        - 302
+        interval: 0
+        successes: 0
+      http_path: /
+      https_verify_certificate: true
+      timeout: 1
+      type: https
+      unhealthy:
+        http_failures: 3
+        http_statuses:
+        - 429
+        - 404
+        - 500
+        - 501
+        - 502
+        - 503
+        - 504
+        - 505
+        interval: 5
+        tcp_failures: 3
+        timeouts: 3
+    passive:
+      healthy:
+        http_statuses:
+        - 200
+        - 201
+        - 202
+        - 203
+        - 204
+        - 205
+        - 206
+        - 207
+        - 208
+        - 226
+        - 300
+        - 301
+        - 302
+        - 303
+        - 304
+        - 305
+        - 306
+        - 307
+        - 308
+        successes: 1
+      type: https
+      unhealthy:
+        http_failures: 2
+        http_statuses:
+        - 400
+        - 429
+        - 500
+        - 503
+        tcp_failures: 2
+        timeouts: 2
+    threshold: 0
+  name: example_upstream
+  slots: 10000
+  tags:
+  - dev
+  targets:
+  - tags:
+    - demo
+    target: httpbin.org:80
+    weight: 100
+  - tags:
+    - demo
+    target: mockbin.org:80
+    weight: 100
